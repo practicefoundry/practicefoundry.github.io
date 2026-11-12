@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/png" href="practice-foundry-mark.png">
+<title>Rental Tracker — Practice Foundry</title>
+<meta name="description" content="Free, simple rental property tracker for landlords with 1-10 units. Rent, expenses, leases and repairs in your browser. No account, no payment.">
+<style>
+  :root{--navy:#002050;--navy-deep:#001638;--navy-soft:#0a3066;--copper:#E07A30;--copper-dark:#9a4e18;--copper-soft:#fbe3d3;--paper:#f7f4ef;--ink:#16222f;--muted:#5b6a7a;--line:#ddd3c7;--card:#fff;--good:#27632f;--good-bg:#e3f2e4;--warn:#7a5b00;--warn-bg:#fdf3d8;--bad:#8c2b2b;--bad-bg:#fbe3e3}
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;color:var(--ink);background:var(--paper);line-height:1.55;-webkit-font-smoothing:antialiased}
+  a{color:inherit}
+  .wrap{max-width:1120px;margin:0 auto;padding:0 20px}
+  header{background:var(--navy-deep);color:#fff}
+  .header-inner{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:16px 0;flex-wrap:wrap}
+  .brand{font-family:Georgia,"Times New Roman",serif;font-size:21px;font-weight:700;text-decoration:none;color:#fff;display:inline-flex;align-items:center;gap:11px}
+  .brand span{color:var(--copper)} .brand-mark{height:38px;width:auto}
+  .header-links{display:flex;gap:18px;flex-wrap:wrap;font-size:14px}
+  .header-links a{color:#cbd6e2;text-decoration:none}.header-links a:hover{color:#fff}
+  .hero{background:var(--navy);color:#fff;padding:34px 0 28px}
+  .hero h1{font-family:Georgia,serif;font-size:clamp(28px,4vw,38px);line-height:1.12;max-width:22ch}
+  .hero p{margin-top:10px;color:#d7e0ea;max-width:68ch;font-size:16px}
+  .badges{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+  .badge{font-size:13px;font-weight:700;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18);color:#e8eef4;padding:6px 10px;border-radius:999px}
+  .badge strong{color:#fff}
+  .toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;padding:18px 0 6px}
+  .btn{display:inline-flex;align-items:center;gap:7px;background:var(--copper);color:var(--navy);border:1px solid var(--copper);font:inherit;font-size:14px;font-weight:700;padding:9px 16px;border-radius:6px;cursor:pointer;text-decoration:none}
+  .btn:hover{background:#eb8f4d}
+  .btn.secondary{background:#fff;color:var(--navy);border-color:var(--line)}
+  .btn.secondary:hover{border-color:var(--navy)}
+  .btn.danger{background:#fff;color:var(--bad);border-color:#e8c4c4}
+  .btn.small{padding:6px 10px;font-size:13px}
+  .toolbar .spacer{flex:1}
+  .note{font-size:13px;color:var(--muted);padding:4px 0 14px;max-width:78ch}
+  nav.tabs{display:flex;gap:6px;flex-wrap:wrap;border-bottom:2px solid var(--line);margin-top:6px}
+  nav.tabs button{font:inherit;font-size:15px;font-weight:700;color:var(--muted);background:none;border:none;border-bottom:3px solid transparent;padding:11px 14px;cursor:pointer;margin-bottom:-2px}
+  nav.tabs button:hover{color:var(--navy)}
+  nav.tabs button[aria-selected="true"]{color:var(--navy);border-bottom-color:var(--copper)}
+  nav.tabs .count{font-size:12px;background:#ece5da;color:var(--navy);border-radius:999px;padding:1px 7px;margin-left:5px;font-weight:700}
+  main{padding:26px 0 56px}
+  .screen{display:none}.screen.active{display:block}
+  .screen h2{font-family:Georgia,serif;font-size:26px;color:var(--navy);line-height:1.2}
+  .screen .sub{color:var(--muted);margin:6px 0 20px;max-width:68ch}
+  .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px}
+  .stat{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:16px 18px}
+  .stat .label{font-size:13px;font-weight:700;color:var(--muted)}
+  .stat .value{font-family:Georgia,serif;font-size:28px;color:var(--navy);margin-top:4px;line-height:1.1}
+  .stat .hint{font-size:13px;color:var(--muted);margin-top:3px}
+  .stat.alert .value{color:var(--bad)} .stat.warn .value{color:var(--warn)}
+  .panels{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .panel{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:18px 20px}
+  .panel h3{font-size:16px;color:var(--navy);margin-bottom:10px}
+  .panel .empty{color:var(--muted);font-size:14px}
+  .rowline{display:flex;justify-content:space-between;gap:14px;padding:9px 0;border-top:1px solid #eee5da;font-size:14.5px}
+  .rowline:first-of-type{border-top:none}
+  .pill{font-weight:700;font-size:12px;padding:2px 9px;border-radius:999px;white-space:nowrap;height:fit-content}
+  .pill.g{background:var(--good-bg);color:var(--good)}.pill.y{background:var(--warn-bg);color:var(--warn)}.pill.r{background:var(--bad-bg);color:var(--bad)}.pill.n{background:#ece5da;color:var(--navy)}
+  .layout{display:grid;grid-template-columns:340px 1fr;gap:18px;align-items:start}
+  form.card{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:18px 20px}
+  form.card h3{font-size:16px;color:var(--navy);margin-bottom:12px}
+  label{display:block;font-size:13px;font-weight:700;color:var(--navy);margin:12px 0 5px}
+  label:first-of-type{margin-top:0}
+  input,select,textarea{width:100%;font:inherit;font-size:15px;color:var(--ink);background:#fff;border:1px solid #c9bda9;border-radius:6px;padding:9px 11px}
+  input:focus,select:focus,textarea:focus{outline:2px solid var(--copper);outline-offset:1px;border-color:var(--copper)}
+  textarea{resize:vertical;min-height:64px}
+  .form-actions{display:flex;gap:8px;margin-top:16px;flex-wrap:wrap}
+  .filterbar{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px;align-items:end}
+  .filterbar .field{min-width:170px;flex:1}
+  .filterbar label{margin-top:0}
+  .cards{display:grid;gap:12px}
+  .item{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:16px 18px}
+  .item-head{display:flex;justify-content:space-between;gap:14px;align-items:start}
+  .item h3{font-size:17px;color:var(--navy);line-height:1.3}
+  .item .meta{color:var(--muted);font-size:14px;margin-top:2px}
+  .item .amount{font-family:Georgia,serif;font-size:19px;color:var(--navy);white-space:nowrap}
+  .item p.notes{font-size:14px;color:#3d4c5e;margin-top:8px}
+  .item-actions{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
+  .tablewrap{background:var(--card);border:1px solid var(--line);border-radius:8px;overflow:auto}
+  table{width:100%;border-collapse:collapse;font-size:14.5px;min-width:640px}
+  th{text-align:left;font-size:12.5px;color:var(--muted);padding:11px 14px;border-bottom:1px solid var(--line);white-space:nowrap}
+  td{padding:10px 14px;border-top:1px solid #eee5da;vertical-align:top}
+  tr:first-child td{border-top:none}
+  td.num,th.num{text-align:right;white-space:nowrap}
+  .empty-box{background:var(--card);border:1px dashed #c9bda9;border-radius:8px;padding:26px 20px;text-align:center;color:var(--muted)}
+  .empty-box strong{color:var(--navy);display:block;font-size:16px;margin-bottom:5px}
+  .totals{display:flex;gap:18px;flex-wrap:wrap;font-size:14px;color:var(--muted);margin:12px 2px 0}
+  .totals strong{color:var(--navy)}
+  footer{background:var(--navy-deep);color:#9fb0c2;padding:28px 0 36px}
+  .footer-inner{display:flex;flex-wrap:wrap;gap:10px 28px;align-items:baseline;justify-content:space-between}
+  .footer-brand{color:#fff;font-family:Georgia,serif;font-weight:700;display:flex;align-items:center;gap:10px}.footer-mark{height:30px}
+  .disclaimer{font-size:12.5px;max-width:62ch}.copyright{flex-basis:100%;font-size:12.5px}
+  #toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%) translateY(20px);background:var(--navy);color:#fff;font-size:14px;font-weight:700;padding:11px 18px;border-radius:8px;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;z-index:50}
+  #toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+  @media(max-width:900px){.stats{grid-template-columns:1fr 1fr}.panels,.layout{grid-template-columns:1fr}}
+  @media(max-width:560px){.stats{grid-template-columns:1fr}nav.tabs button{padding:10px 9px;font-size:14px}}
+  @media print{header .header-links,.hero .badges,.toolbar,nav.tabs,form.card,.item-actions,.filterbar,footer{display:none!important}.screen{display:none!important}#screen-dashboard{display:block!important}body{background:#fff}}
+  @media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap header-inner">
+    <a class="brand" href="index.html"><img class="brand-mark" src="practice-foundry-mark.png" alt="">Practice <span>Foundry</span></a>
+    <div class="header-links">
+      <a href="index.html">&larr; Homepage</a>
+      <a href="https://practicefoundry.etsy.com/listing/4606043544/rental-property-tracker-spreadsheet-rent">Spreadsheet version on Etsy</a>
+      <a href="mailto:practicefoundry@proton.me">practicefoundry@proton.me</a>
+    </div>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="wrap">
+    <h1>Rental Tracker</h1>
+    <p>A simple tracker for landlords with 1–10 units. Rent in, expenses out, lease dates and repairs — in six screens, with nothing to install and nothing to pay.</p>
+    <div class="badges">
+      <span class="badge"><strong>Free</strong> — no tiers, no trial</span>
+      <span class="badge"><strong>No account</strong> — no signup</span>
+      <span class="badge"><strong>Private</strong> — data stays in this browser</span>
+    </div>
+  </div>
+</section>
+
+<div class="wrap">
+  <div class="toolbar" role="toolbar" aria-label="Tracker actions">
+    <button class="btn" type="button" id="btn-export">Download year-end CSV</button>
+    <button class="btn secondary" type="button" id="btn-print">Print report</button>
+    <button class="btn secondary" type="button" id="btn-backup">Backup (JSON)</button>
+    <label class="btn secondary" for="import-file" style="margin:0;cursor:pointer">Restore backup</label>
+    <input id="import-file" type="file" accept="application/json,.json" hidden>
+    <span class="spacer"></span>
+    <button class="btn secondary" type="button" id="btn-sample">Load sample data</button>
+    <button class="btn danger" type="button" id="btn-clear">Clear all data</button>
+  </div>
+  <p class="note">Your data is saved only in this browser on this device (local storage). It is not sent anywhere. Use Backup (JSON) before clearing browser data or switching devices. General information only — not legal, tax, or financial advice.</p>
+
+  <nav class="tabs" role="tablist" aria-label="Rental Tracker screens">
+    <button role="tab" data-screen="dashboard" aria-selected="true">Dashboard</button>
+    <button role="tab" data-screen="properties" aria-selected="false">Properties <span class="count" data-count="properties">0</span></button>
+    <button role="tab" data-screen="rent" aria-selected="false">Rent <span class="count" data-count="rents">0</span></button>
+    <button role="tab" data-screen="expenses" aria-selected="false">Expenses <span class="count" data-count="expenses">0</span></button>
+    <button role="tab" data-screen="leases" aria-selected="false">Leases <span class="count" data-count="leases">0</span></button>
+    <button role="tab" data-screen="repairs" aria-selected="false">Repairs <span class="count" data-count="repairs">0</span></button>
+  </nav>
+
+  <main>
+    <!-- 1. DASHBOARD -->
+    <section class="screen active" id="screen-dashboard" aria-label="Dashboard">
+      <h2>Dashboard</h2>
+      <p class="sub">This month at a glance. Add a property, a lease and a rent payment, and this page does the rest.</p>
+      <div class="stats" id="dash-stats"></div>
+      <div class="panels">
+        <div class="panel"><h3>Needs attention</h3><div id="dash-attention"></div></div>
+        <div class="panel"><h3>Coming up</h3><div id="dash-upcoming"></div></div>
+      </div>
+      <div class="panels" style="margin-top:14px">
+        <div class="panel"><h3>Year so far</h3><div id="dash-year"></div></div>
+        <div class="panel"><h3>By property (this year)</h3><div id="dash-byproperty"></div></div>
+      </div>
+    </section>
+
+    <!-- 2. PROPERTIES -->
+    <section class="screen" id="screen-properties" aria-label="Properties and units">
+      <h2>Properties &amp; units</h2>
+      <p class="sub">One card per unit. A duplex is two units — add it twice with Unit A and Unit B.</p>
+      <div class="layout">
+        <form class="card" id="form-property">
+          <h3 id="form-property-title">Add a property</h3>
+          <input type="hidden" id="p-id">
+          <label for="p-name">Property name</label><input id="p-name" required placeholder="e.g. Maple St Duplex — Unit A">
+          <label for="p-address">Address</label><input id="p-address" placeholder="123 Maple St, Louisville, KY">
+          <label for="p-unit">Unit</label><input id="p-unit" placeholder="Unit A, Apt 2, or —">
+          <label for="p-rent">Monthly rent ($)</label><input id="p-rent" type="number" min="0" step="0.01" placeholder="1200">
+          <label for="p-deposit">Deposit held ($)</label><input id="p-deposit" type="number" min="0" step="0.01" placeholder="1200">
+          <label for="p-notes">Notes</label><textarea id="p-notes" placeholder="Parking, laundry, HOA, anything worth remembering"></textarea>
+          <div class="form-actions"><button class="btn" type="submit">Save property</button><button class="btn secondary" type="button" data-cancel="property">Cancel edit</button></div>
+        </form>
+        <div class="cards" id="list-properties"></div>
+      </div>
+    </section>
+
+    <!-- 3. RENT -->
+    <section class="screen" id="screen-rent" aria-label="Rent ledger">
+      <h2>Rent ledger</h2>
+      <p class="sub">One row per unit, per month. Record what was due, what was paid, and what is still owed.</p>
+      <div class="layout">
+        <form class="card" id="form-rent">
+          <h3 id="form-rent-title">Add a rent record</h3>
+          <input type="hidden" id="r-id">
+          <label for="r-property">Property / unit</label><select id="r-property" required></select>
+          <label for="r-tenant">Tenant</label><input id="r-tenant" required placeholder="Tenant name">
+          <label for="r-month">Month</label><input id="r-month" type="month" required>
+          <label for="r-dueday">Due date</label><input id="r-dueday" type="date">
+          <label for="r-due">Rent due ($)</label><input id="r-due" type="number" min="0" step="0.01" required placeholder="1200">
+          <label for="r-paid">Paid ($)</label><input id="r-paid" type="number" min="0" step="0.01" value="0">
+          <label for="r-paiddate">Date paid</label><input id="r-paiddate" type="date">
+          <label for="r-method">How paid</label><select id="r-method"><option>Bank transfer</option><option>Check</option><option>Cash</option><option>Venmo / Zelle</option><option>Money order</option><option>Other</option></select>
+          <label for="r-notes">Notes</label><textarea id="r-notes" placeholder="Partial payment, late fee, arrangement made…"></textarea>
+          <div class="form-actions"><button class="btn" type="submit">Save rent record</button><button class="btn secondary" type="button" data-cancel="rent">Cancel edit</button></div>
+        </form>
+        <div>
+          <div class="filterbar"><div class="field"><label for="rent-month-filter">Show month</label><input id="rent-month-filter" type="month"></div></div>
+          <div class="tablewrap"><table><thead><tr><th>Unit</th><th>Tenant</th><th>Month</th><th class="num">Due</th><th class="num">Paid</th><th class="num">Owed</th><th>Status</th><th></th></tr></thead><tbody id="list-rents"></tbody></table></div>
+          <div class="totals" id="rent-totals"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4. EXPENSES -->
+    <section class="screen" id="screen-expenses" aria-label="Expenses">
+      <h2>Expenses</h2>
+      <p class="sub">Everything a property costs you, by property and category — ready for tax time.</p>
+      <div class="layout">
+        <form class="card" id="form-expense">
+          <h3 id="form-expense-title">Add an expense</h3>
+          <input type="hidden" id="e-id">
+          <label for="e-property">Property / unit</label><select id="e-property"></select>
+          <label for="e-date">Date</label><input id="e-date" type="date" required>
+          <label for="e-category">Category</label><select id="e-category"><option>Mortgage</option><option>Insurance</option><option>Property tax</option><option>Utilities</option><option>Repairs &amp; maintenance</option><option>Management</option><option>HOA</option><option>Supplies</option><option>Legal / professional</option><option>Other</option></select>
+          <label for="e-vendor">Paid to</label><input id="e-vendor" placeholder="Vendor or payee">
+          <label for="e-amount">Amount ($)</label><input id="e-amount" type="number" min="0" step="0.01" required placeholder="0.00">
+          <label for="e-notes">Notes</label><textarea id="e-notes" placeholder="Invoice no., what it covered…"></textarea>
+          <div class="form-actions"><button class="btn" type="submit">Save expense</button><button class="btn secondary" type="button" data-cancel="expense">Cancel edit</button></div>
+        </form>
+        <div>
+          <div class="filterbar">
+            <div class="field"><label for="expense-year">Year</label><select id="expense-year"></select></div>
+            <div class="field"><label for="expense-prop">Property</label><select id="expense-prop"></select></div>
+          </div>
+          <div class="tablewrap"><table><thead><tr><th>Date</th><th>Property</th><th>Category</th><th>Paid to</th><th class="num">Amount</th><th></th></tr></thead><tbody id="list-expenses"></tbody></table></div>
+          <div class="totals" id="expense-totals"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 5. LEASES -->
+    <section class="screen" id="screen-leases" aria-label="Leases and tenants">
+      <h2>Leases &amp; tenants</h2>
+      <p class="sub">Who lives where, and when the lease ends. Leases ending within 60 days are flagged for you — check the Dashboard.</p>
+      <div class="layout">
+        <form class="card" id="form-lease">
+          <h3 id="form-lease-title">Add a lease</h3>
+          <input type="hidden" id="l-id">
+          <label for="l-property">Property / unit</label><select id="l-property" required></select>
+          <label for="l-tenant">Tenant</label><input id="l-tenant" required placeholder="Full name">
+          <label for="l-contact">Contact</label><input id="l-contact" placeholder="Phone or email">
+          <label for="l-start">Lease start</label><input id="l-start" type="date" required>
+          <label for="l-end">Lease end</label><input id="l-end" type="date" required>
+          <label for="l-dueday">Rent due day (1–31)</label><input id="l-dueday" type="number" min="1" max="31" value="1">
+          <label for="l-rent">Monthly rent ($)</label><input id="l-rent" type="number" min="0" step="0.01" required placeholder="1200">
+          <label for="l-deposit">Deposit held ($)</label><input id="l-deposit" type="number" min="0" step="0.01" placeholder="1200">
+          <label for="l-notes">Notes</label><textarea id="l-notes" placeholder="Pets, renewal terms, anything agreed…"></textarea>
+          <div class="form-actions"><button class="btn" type="submit">Save lease</button><button class="btn secondary" type="button" data-cancel="lease">Cancel edit</button></div>
+        </form>
+        <div class="cards" id="list-leases"></div>
+      </div>
+    </section>
+
+    <!-- 6. REPAIRS -->
+    <section class="screen" id="screen-repairs" aria-label="Repairs and notes">
+      <h2>Repairs &amp; notes</h2>
+      <p class="sub">A repair log per unit: what broke, who fixed it, what it cost. This log does not count in expense totals — add the cost under Expenses if you want it in your totals and export.</p>
+      <div class="layout">
+        <form class="card" id="form-repair">
+          <h3 id="form-repair-title">Add a repair</h3>
+          <input type="hidden" id="rp-id">
+          <label for="rp-property">Property / unit</label><select id="rp-property"></select>
+          <label for="rp-date">Date reported</label><input id="rp-date" type="date" required>
+          <label for="rp-title">What needs fixing</label><input id="rp-title" required placeholder="e.g. Water heater leaking">
+          <label for="rp-vendor">Who fixed / will fix it</label><input id="rp-vendor" placeholder="Vendor or handyman">
+          <label for="rp-cost">Cost ($)</label><input id="rp-cost" type="number" min="0" step="0.01" placeholder="0.00">
+          <label for="rp-status">Status</label><select id="rp-status"><option>Open</option><option>Scheduled</option><option>Done</option></select>
+          <label for="rp-notes">Notes</label><textarea id="rp-notes" placeholder="Parts, warranty, follow-up needed…"></textarea>
+          <div class="form-actions"><button class="btn" type="submit">Save repair</button><button class="btn secondary" type="button" data-cancel="repair">Cancel edit</button></div>
+        </form>
+        <div>
+          <div class="filterbar"><div class="field"><label for="repair-filter">Show</label><select id="repair-filter"><option value="">All repairs</option><option value="open">Open &amp; scheduled only</option><option value="Done">Done only</option></select></div></div>
+          <div class="cards" id="list-repairs"></div>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<footer>
+  <div class="wrap footer-inner">
+    <div class="footer-brand"><img class="footer-mark" src="practice-foundry-mark.png" alt="">Practice Foundry</div>
+    <p class="disclaimer">General business information only, not legal, tax, financial, or medical advice. This tracker stores data only in your browser.</p>
+    <p class="copyright">&copy; 2026 Practice Foundry. All rights reserved.</p>
+  </div>
+</footer>
+<div id="toast" role="status" aria-live="polite"></div>
+<script>
+(function(){
+"use strict";
+var KEY="pf-rental-tracker-v1";
+var $=function(id){return document.getElementById(id)};
+var data=load();
+function blank(){return {properties:[],rents:[],expenses:[],leases:[],repairs:[]}}
+function sanitize(p){var out=blank();if(!p||typeof p!=="object")return out;["properties","rents","expenses","leases","repairs"].forEach(function(k){if(Array.isArray(p[k]))out[k]=p[k].filter(function(x){return x&&typeof x==="object"&&!Array.isArray(x)})});return out}
+function load(){try{var raw=localStorage.getItem(KEY);if(raw){var p=JSON.parse(raw);if(p&&Array.isArray(p.properties))return sanitize(p)}}catch(e){}return blank()}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(data))}catch(e){toast("Could not save in this browser.")}}
+function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,7)}
+function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]})}
+function money(n){var v=Number(n)||0;return "$"+v.toLocaleString("en-US",{minimumFractionDigits:0,maximumFractionDigits:0})}
+function money2(n){var v=Number(n)||0;return "$"+v.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2})}
+function today(){var d=new Date();return d.toISOString().slice(0,10)}
+function thisMonth(){var d=new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")}
+function thisYear(){return String(new Date().getFullYear())}
+function daysUntil(dateStr){if(!dateStr)return null;var a=new Date();a.setHours(0,0,0,0);var b=new Date(dateStr+"T00:00:00");return Math.round((b-a)/86400000)}
+function propName(id){var p=data.properties.find(function(x){return x.id===id});return p?p.name:"—"}
+function toast(msg){var t=$("toast");t.textContent=msg;t.classList.add("show");setTimeout(function(){t.classList.remove("show")},2600)}
+function needProperty(){if(!data.properties.length){toast("Add a property first — Properties tab.");switchScreen("properties");return false}return true}
+
+/* ---------- sample data (dates relative to today so the dashboard is alive) ---------- */
+function sample(){
+  var now=new Date(),y=now.getFullYear(),m=now.getMonth();
+  function d(off){var t=new Date(now);t.setDate(t.getDate()+off);return t.toISOString().slice(0,10)}
+  function mo(off){var t=new Date(y,m+off,1);return t.getFullYear()+"-"+String(t.getMonth()+1).padStart(2,"0")}
+  var p1={id:uid(),name:"Maple St Duplex — Unit A",address:"123 Maple St",unit:"Unit A",rent:1250,deposit:1250,notes:"Tenant pays electric. Owner pays water."};
+  var p2={id:uid(),name:"Maple St Duplex — Unit B",address:"123 Maple St",unit:"Unit B",rent:1150,deposit:1150,notes:"Vacant-friendly layout. Furnace serviced Oct."};
+  var p3={id:uid(),name:"Elm Ave House",address:"48 Elm Ave",unit:"—",rent:1600,deposit:1600,notes:"Fenced yard. Pets allowed with deposit."};
+  return {properties:[p1,p2,p3],
+    leases:[
+      {id:uid(),propertyId:p1.id,tenant:"J. Alvarez",contact:"(555) 014-2201",start:d(-200),end:d(42),dueDay:1,rent:1250,deposit:1250,notes:"Renewal likely — ask 60 days out."},
+      {id:uid(),propertyId:p2.id,tenant:"S. Nguyen",contact:"(555) 014-8834",start:d(-320),end:d(18),dueDay:1,rent:1150,deposit:1150,notes:"Lease ending soon — start renewal talk now."},
+      {id:uid(),propertyId:p3.id,tenant:"M. Carter",contact:"(555) 014-5519",start:d(-90),end:d(275),dueDay:5,rent:1600,deposit:1600,notes:""}],
+    rents:[
+      {id:uid(),propertyId:p1.id,tenant:"J. Alvarez",month:mo(0),dueDate:d(-(now.getDate()-1)),due:1250,paid:1250,paidDate:d(-2),method:"Bank transfer",notes:""},
+      {id:uid(),propertyId:p2.id,tenant:"S. Nguyen",month:mo(0),dueDate:d(-(now.getDate()-1)),due:1150,paid:600,paidDate:d(-1),method:"Venmo / Zelle",notes:"Balance promised Friday."},
+      {id:uid(),propertyId:p3.id,tenant:"M. Carter",month:mo(0),dueDate:d(-(now.getDate()-5)),due:1600,paid:0,paidDate:"",method:"Bank transfer",notes:""},
+      {id:uid(),propertyId:p1.id,tenant:"J. Alvarez",month:mo(-1),dueDate:mo(-1)+"-01",due:1250,paid:1250,paidDate:mo(-1)+"-02",method:"Bank transfer",notes:""},
+      {id:uid(),propertyId:p3.id,tenant:"M. Carter",month:mo(-1),dueDate:mo(-1)+"-05",due:1600,paid:1600,paidDate:mo(-1)+"-04",method:"Check",notes:""}],
+    expenses:[
+      {id:uid(),propertyId:p1.id,date:d(-12),category:"Insurance",vendor:"State insurer",amount:142,notes:"Monthly premium"},
+      {id:uid(),propertyId:p1.id,date:d(-20),category:"Repairs & maintenance",vendor:"Ace Plumbing",amount:180,notes:"Kitchen faucet"},
+      {id:uid(),propertyId:p3.id,date:d(-6),category:"Utilities",vendor:"City water",amount:64,notes:""},
+      {id:uid(),propertyId:p3.id,date:d(-30),category:"Property tax",vendor:"County",amount:940,notes:"First half"}],
+    repairs:[
+      {id:uid(),propertyId:p1.id,date:d(-3),title:"Water heater leaking at base",vendor:"Ace Plumbing",cost:0,status:"Scheduled",notes:"Quote expected this week."},
+      {id:uid(),propertyId:p3.id,date:d(-15),title:"Fence gate latch broken",vendor:"",cost:45,status:"Open",notes:"Tenant reported."},
+      {id:uid(),propertyId:p2.id,date:d(-40),title:"Replaced smoke detectors",vendor:"Handyman — R. Cole",cost:120,status:"Done",notes:"All units checked."}]};
+}
+
+/* ---------- tabs ---------- */
+function switchScreen(name){
+  document.querySelectorAll("nav.tabs button").forEach(function(b){b.setAttribute("aria-selected",b.dataset.screen===name?"true":"false")});
+  document.querySelectorAll(".screen").forEach(function(s){s.classList.toggle("active",s.id==="screen-"+name)});
+}
+document.querySelectorAll("nav.tabs button").forEach(function(b){b.addEventListener("click",function(){switchScreen(b.dataset.screen)})});
+
+/* ---------- rendering ---------- */
+function counts(){document.querySelectorAll("[data-count]").forEach(function(el){el.textContent=data[el.dataset.count].length})}
+function fillPropertySelects(){
+  var opts=data.properties.map(function(p){return '<option value="'+p.id+'">'+esc(p.name)+"</option>"}).join("");
+  ["r-property","e-property","l-property","rp-property"].forEach(function(id){var el=$(id);if(el){var v=el.value;el.innerHTML=(id==="e-property"||id==="rp-property"?'<option value="">All / general</option>':"")+opts;if(v)el.value=v}});
+  var ep=$("expense-prop");var v2=ep.value;ep.innerHTML='<option value="">All properties</option>'+opts;ep.value=v2;
+}
+function rentStatus(r){
+  var owed=(Number(r.due)||0)-(Number(r.paid)||0);
+  if(owed<=0)return {label:"Paid",cls:"g",owed:0};
+  var late=r.dueDate&&daysUntil(r.dueDate)<0;
+  if(Number(r.paid)>0)return {label:late?"Partial — late":"Partial",cls:"y",owed:owed};
+  return {label:late?"Late":"Unpaid",cls:late?"r":"y",owed:owed};
+}
+function renderDashboard(){
+  var mo=thisMonth(),yr=thisYear();
+  var due=0,paid=0,owed=0,lateCount=0;
+  data.rents.filter(function(r){return r.month===mo}).forEach(function(r){var s=rentStatus(r);due+=Number(r.due)||0;paid+=Number(r.paid)||0;owed+=s.owed;if(s.owed>0&&r.dueDate&&daysUntil(r.dueDate)<0)lateCount++});
+  var ending=data.leases.filter(function(l){var d=daysUntil(l.end);return d!==null&&d>=0&&d<=60});
+  var openRepairs=data.repairs.filter(function(r){return r.status!=="Done"});
+  var yPaid=0,yExp=0;
+  data.rents.forEach(function(r){if(r.month&&String(r.month).indexOf(yr)===0)yPaid+=Number(r.paid)||0});
+  data.expenses.forEach(function(e){if(e.date&&String(e.date).indexOf(yr)===0)yExp+=Number(e.amount)||0});
+  var cards=[
+    {label:"Rent due this month",value:money(due),hint:data.rents.filter(function(r){return r.month===mo}).length+" record(s) for "+mo},
+    {label:"Collected this month",value:money(paid),hint:due?Math.round(paid/Math.max(due,1)*100)+"% of rent due":"No rent recorded yet"},
+    {label:"Still owed",value:money(owed),hint:lateCount?lateCount+" late payment(s)":"Nothing overdue",cls:owed>0?(lateCount?"alert":"warn"):""},
+    {label:"Needs attention",value:String(ending.length+openRepairs.length),hint:ending.length+" lease(s) ending in 60 days · "+openRepairs.length+" open repair(s)",cls:(ending.length+openRepairs.length)?"warn":""}];
+  $("dash-stats").innerHTML=cards.map(function(c){return '<div class="stat '+(c.cls||"")+'"><div class="label">'+esc(c.label)+'</div><div class="value">'+esc(c.value)+'</div><div class="hint">'+esc(c.hint)+"</div></div>"}).join("");
+  var att=[];
+  data.rents.filter(function(r){return r.month===mo}).forEach(function(r){var s=rentStatus(r);if(s.owed>0)att.push({t:esc(r.tenant)+" — "+esc(propName(r.propertyId)),p:'<span class="pill '+s.cls+'">'+s.label+" · "+money(s.owed)+"</span>"})});
+  openRepairs.forEach(function(r){att.push({t:esc(r.title)+" — "+esc(propName(r.propertyId)),p:'<span class="pill y">'+esc(r.status)+"</span>"})});
+  $("dash-attention").innerHTML=att.length?att.map(function(a){return '<div class="rowline"><span>'+a.t+"</span>"+a.p+"</div>"}).join(""):'<p class="empty">Nothing overdue and no open repairs. You are caught up.</p>';
+  var up=ending.slice().sort(function(a,b){return a.end<b.end?-1:1}).map(function(l){var d=daysUntil(l.end);return {t:esc(l.tenant)+" lease ends "+esc(l.end)+" — "+esc(propName(l.propertyId)),p:'<span class="pill '+(d<=30?"r":"y")+'">'+d+" days</span>"}});
+  $("dash-upcoming").innerHTML=up.length?up.map(function(a){return '<div class="rowline"><span>'+a.t+"</span>"+a.p+"</div>"}).join(""):'<p class="empty">No leases ending in the next 60 days.</p>';
+  $("dash-year").innerHTML='<div class="rowline"><span>Rent collected ('+yr+')</span><strong>'+money(yPaid)+'</strong></div><div class="rowline"><span>Expenses ('+yr+')</span><strong>'+money(yExp)+'</strong></div><div class="rowline"><span>Profit so far</span><strong>'+money(yPaid-yExp)+"</strong></div>";
+  var byP=data.properties.map(function(p){
+    var inc=0,exp=0;data.rents.forEach(function(r){if(r.propertyId===p.id&&String(r.month||"").indexOf(yr)===0)inc+=Number(r.paid)||0});
+    data.expenses.forEach(function(e){if(e.propertyId===p.id&&String(e.date||"").indexOf(yr)===0)exp+=Number(e.amount)||0});
+    return {t:esc(p.name),p:"<span>"+money(inc-exp)+"</span>"}});
+  $("dash-byproperty").innerHTML=byP.length?byP.map(function(a){return '<div class="rowline"><span>'+a.t+"</span>"+a.p+"</div>"}).join(""):'<p class="empty">Add your first property to see this.</p>';
+}
+function renderProperties(){
+  var el=$("list-properties");
+  if(!data.properties.length){el.innerHTML='<div class="empty-box"><strong>No properties yet</strong>Add your first unit with the form. A duplex counts as two units.</div>';return}
+  el.innerHTML=data.properties.map(function(p){
+    var lease=data.leases.find(function(l){return l.propertyId===p.id});
+    return '<article class="item"><div class="item-head"><div><h3>'+esc(p.name)+'</h3><div class="meta">'+esc(p.address||"")+(p.unit&&p.unit!=="—"?" · "+esc(p.unit):"")+'</div><div class="meta">'+(lease?"Tenant: "+esc(lease.tenant)+" · lease ends "+esc(lease.end):"No lease on file")+'</div></div><div class="amount">'+money(p.rent)+'<span style="font-size:13px;color:var(--muted)">/mo</span></div></div>'+(p.notes?'<p class="notes">'+esc(p.notes)+"</p>":"")+'<div class="meta" style="margin-top:6px">Deposit held: '+money(p.deposit)+'</div><div class="item-actions"><button class="btn secondary small" data-edit-property="'+p.id+'">Edit</button><button class="btn danger small" data-del-property="'+p.id+'">Delete</button></div></article>'}).join("");
+}
+function renderRents(){
+  var f=$("rent-month-filter").value;
+  var rows=data.rents.slice().sort(function(a,b){return a.month<b.month?1:-1}).filter(function(r){return !f||r.month===f});
+  $("list-rents").innerHTML=rows.length?rows.map(function(r){var s=rentStatus(r);return "<tr><td>"+esc(propName(r.propertyId))+"</td><td>"+esc(r.tenant)+"</td><td>"+esc(r.month)+'</td><td class="num">'+money(r.due)+'</td><td class="num">'+money(r.paid)+'</td><td class="num">'+money(s.owed)+'</td><td><span class="pill '+s.cls+'">'+s.label+'</span></td><td><button class="btn secondary small" data-edit-rent="'+r.id+'">Edit</button> <button class="btn danger small" data-del-rent="'+r.id+'">Delete</button></td></tr>'}).join(""):'<tr><td colspan="8" style="color:var(--muted)">No rent records for this view yet.</td></tr>';
+  var due=0,paid=0;rows.forEach(function(r){due+=Number(r.due)||0;paid+=Number(r.paid)||0});
+  $("rent-totals").innerHTML="<span>Due: <strong>"+money(due)+"</strong></span><span>Paid: <strong>"+money(paid)+"</strong></span><span>Owed: <strong>"+money(due-paid)+"</strong></span>";
+}
+function fillExpenseYears(){
+  var sel=$("expense-year");var keep=sel.value;
+  var yrs={};data.expenses.forEach(function(e){if(e.date)yrs[String(e.date).slice(0,4)]=1});yrs[thisYear()]=1;
+  sel.innerHTML=Object.keys(yrs).sort().reverse().map(function(y){return '<option value="'+y+'">'+y+"</option>"}).join("");
+  sel.value=(keep&&yrs[keep])?keep:thisYear();
+}
+function renderExpenses(){
+  fillExpenseYears();
+  var yr=$("expense-year").value||thisYear(),pf=$("expense-prop").value;
+  var rows=data.expenses.slice().sort(function(a,b){return a.date<b.date?1:-1}).filter(function(e){return (e.date||"").indexOf(yr)===0&&(!pf||e.propertyId===pf)});
+  $("list-expenses").innerHTML=rows.length?rows.map(function(e){return "<tr><td>"+esc(e.date)+"</td><td>"+esc(e.propertyId?propName(e.propertyId):"General")+"</td><td>"+esc(e.category)+"</td><td>"+esc(e.vendor||"—")+'</td><td class="num">'+money2(e.amount)+'</td><td><button class="btn secondary small" data-edit-expense="'+e.id+'">Edit</button> <button class="btn danger small" data-del-expense="'+e.id+'">Delete</button></td></tr>'}).join(""):'<tr><td colspan="6" style="color:var(--muted)">No expenses for this view yet.</td></tr>';
+  var total=0;var byCat={};rows.forEach(function(e){total+=Number(e.amount)||0;byCat[e.category]=(byCat[e.category]||0)+(Number(e.amount)||0)});
+  var top=Object.keys(byCat).sort(function(a,b){return byCat[b]-byCat[a]}).slice(0,3).map(function(k){return k+": <strong>"+money(byCat[k])+"</strong>"}).join(" · ");
+  $("expense-totals").innerHTML="<span>Total ("+yr+"): <strong>"+money(total)+"</strong></span>"+(top?"<span>"+top+"</span>":"");
+}
+function leasePill(l){var d=daysUntil(l.end);if(d===null)return '<span class="pill n">No end date</span>';if(d<0)return '<span class="pill r">Ended '+Math.abs(d)+' days ago</span>';if(d<=30)return '<span class="pill r">Ends in '+d+" days</span>";if(d<=60)return '<span class="pill y">Ends in '+d+" days</span>";return '<span class="pill g">'+d+" days left</span>"}
+function renderLeases(){
+  var el=$("list-leases");
+  if(!data.leases.length){el.innerHTML='<div class="empty-box"><strong>No leases yet</strong>Add a lease and the Dashboard will flag it 60 days before it ends.</div>';return}
+  el.innerHTML=data.leases.slice().sort(function(a,b){return a.end<b.end?-1:1}).map(function(l){
+    return '<article class="item"><div class="item-head"><div><h3>'+esc(l.tenant)+'</h3><div class="meta">'+esc(propName(l.propertyId))+" · "+esc(l.start)+" → "+esc(l.end)+'</div><div class="meta">Due on day '+esc(l.dueDay||1)+(l.contact?" · "+esc(l.contact):"")+'</div></div>'+leasePill(l)+'</div><div class="meta" style="margin-top:6px">Rent '+money(l.rent)+"/mo · Deposit held: "+money(l.deposit)+"</div>"+(l.notes?'<p class="notes">'+esc(l.notes)+"</p>":"")+'<div class="item-actions"><button class="btn secondary small" data-edit-lease="'+l.id+'">Edit</button><button class="btn danger small" data-del-lease="'+l.id+'">Delete</button></div></article>'}).join("");
+}
+function renderRepairs(){
+  var f=$("repair-filter").value;
+  var rows=data.repairs.slice().sort(function(a,b){return a.date<b.date?1:-1}).filter(function(r){if(f==="open")return r.status!=="Done";if(f==="Done")return r.status==="Done";return true});
+  var el=$("list-repairs");
+  if(!rows.length){el.innerHTML='<div class="empty-box"><strong>Nothing here</strong>No repairs match this view.</div>';return}
+  el.innerHTML=rows.map(function(r){
+    var pill=r.status==="Done"?'<span class="pill g">Done</span>':r.status==="Scheduled"?'<span class="pill y">Scheduled</span>':'<span class="pill r">Open</span>';
+    return '<article class="item"><div class="item-head"><div><h3>'+esc(r.title)+'</h3><div class="meta">'+esc(propName(r.propertyId))+" · reported "+esc(r.date)+(r.vendor?" · "+esc(r.vendor):"")+'</div></div>'+pill+'</div>'+(Number(r.cost)?'<div class="meta" style="margin-top:6px">Cost: '+money(r.cost)+"</div>":"")+(r.notes?'<p class="notes">'+esc(r.notes)+"</p>":"")+'<div class="item-actions"><button class="btn secondary small" data-edit-repair="'+r.id+'">Edit</button><button class="btn danger small" data-del-repair="'+r.id+'">Delete</button></div></article>'}).join("");
+}
+function render(){
+  counts();fillPropertySelects();renderDashboard();renderProperties();renderRents();renderExpenses();renderLeases();renderRepairs();
+}
+
+/* ---------- forms ---------- */
+function upsert(list,obj,id){if(id){var i=list.findIndex(function(x){return x.id===id});if(i>-1){obj.id=id;list[i]=obj;return "updated"}}obj.id=uid();list.push(obj);return "saved"}
+function bindForm(formId,fn){$(formId).addEventListener("submit",function(ev){ev.preventDefault();fn();save();render()})}
+bindForm("form-property",function(){
+  var o={name:$("p-name").value.trim(),address:$("p-address").value.trim(),unit:$("p-unit").value.trim(),rent:Number($("p-rent").value)||0,deposit:Number($("p-deposit").value)||0,notes:$("p-notes").value.trim()};
+  if(!o.name)return;var r=upsert(data.properties,o,$("p-id").value);$("form-property").reset();$("p-id").value="";$("form-property-title").textContent="Add a property";toast("Property "+r+".")});
+bindForm("form-rent",function(){if(!needProperty())return;
+  var o={propertyId:$("r-property").value,tenant:$("r-tenant").value.trim(),month:$("r-month").value,dueDate:$("r-dueday").value,due:Number($("r-due").value)||0,paid:Number($("r-paid").value)||0,paidDate:$("r-paiddate").value,method:$("r-method").value,notes:$("r-notes").value.trim()};
+  var editId=$("r-id").value;
+  if(o.month&&data.rents.some(function(x){return x.propertyId===o.propertyId&&x.month===o.month&&x.id!==editId})){toast("A rent record already exists for this unit and month — edit that one instead.");return}
+  var r=upsert(data.rents,o,editId);$("form-rent").reset();$("r-id").value="";$("r-paid").value="0";$("r-month").value=thisMonth();$("form-rent-title").textContent="Add a rent record";toast("Rent record "+r+".")});
+bindForm("form-expense",function(){
+  var o={propertyId:$("e-property").value,date:$("e-date").value,category:$("e-category").value,vendor:$("e-vendor").value.trim(),amount:Number($("e-amount").value)||0,notes:$("e-notes").value.trim()};
+  var r=upsert(data.expenses,o,$("e-id").value);$("form-expense").reset();$("e-id").value="";$("e-date").value=today();$("form-expense-title").textContent="Add an expense";toast("Expense "+r+".")});
+bindForm("form-lease",function(){if(!needProperty())return;
+  var o={propertyId:$("l-property").value,tenant:$("l-tenant").value.trim(),contact:$("l-contact").value.trim(),start:$("l-start").value,end:$("l-end").value,dueDay:Number($("l-dueday").value)||1,rent:Number($("l-rent").value)||0,deposit:Number($("l-deposit").value)||0,notes:$("l-notes").value.trim()};
+  if(o.end&&o.start&&o.end<o.start){toast("Lease end is before its start — check the dates.");return}
+  var r=upsert(data.leases,o,$("l-id").value);$("form-lease").reset();$("l-id").value="";$("l-dueday").value="1";$("form-lease-title").textContent="Add a lease";toast("Lease "+r+".")});
+bindForm("form-repair",function(){
+  var o={propertyId:$("rp-property").value,date:$("rp-date").value,title:$("rp-title").value.trim(),vendor:$("rp-vendor").value.trim(),cost:Number($("rp-cost").value)||0,status:$("rp-status").value,notes:$("rp-notes").value.trim()};
+  var r=upsert(data.repairs,o,$("rp-id").value);$("form-repair").reset();$("rp-id").value="";$("rp-date").value=today();$("form-repair-title").textContent="Add a repair";toast("Repair "+r+".")});
+
+/* ---------- edit / delete (event delegation) ---------- */
+function fill(id,val){$(id).value=val==null?"":val}
+document.addEventListener("click",function(ev){
+  var t=ev.target.closest("[data-edit-property],[data-del-property],[data-edit-rent],[data-del-rent],[data-edit-expense],[data-del-expense],[data-edit-lease],[data-del-lease],[data-edit-repair],[data-del-repair],[data-cancel]");
+  if(!t)return;
+  if(t.dataset.cancel!==undefined&&t.hasAttribute("data-cancel")){
+    var kind=t.dataset.cancel;var form=$("form-"+kind);if(form)form.reset();
+    if(kind==="rent"){$("r-month").value=thisMonth();$("r-paid").value="0"}if(kind==="expense")$("e-date").value=today();if(kind==="repair")$("rp-date").value=today();if(kind==="lease")$("l-dueday").value="1";
+    var idMap={property:"p-id",rent:"r-id",expense:"e-id",lease:"l-id",repair:"rp-id"};fill(idMap[kind],"");
+    var titleMap={property:"form-property-title",rent:"form-rent-title",expense:"form-expense-title",lease:"form-lease-title",repair:"form-repair-title"};
+    var labelMap={property:"Add a property",rent:"Add a rent record",expense:"Add an expense",lease:"Add a lease",repair:"Add a repair"};
+    $(titleMap[kind]).textContent=labelMap[kind];return;
+  }
+  function del(list,id,label){if(confirm("Delete this "+label+"? This cannot be undone.")){var i=list.findIndex(function(x){return x.id===id});if(i>-1)list.splice(i,1);save();render();toast(label+" deleted.")}}
+  if(t.dataset.editProperty){var p=data.properties.find(function(x){return x.id===t.dataset.editProperty});if(p){fill("p-id",p.id);fill("p-name",p.name);fill("p-address",p.address);fill("p-unit",p.unit);fill("p-rent",p.rent);fill("p-deposit",p.deposit);fill("p-notes",p.notes);$("form-property-title").textContent="Edit property";switchScreen("properties");window.scrollTo({top:0,behavior:"smooth"})}}
+  if(t.dataset.delProperty){var pid=t.dataset.delProperty;var nR=data.rents.filter(function(r){return r.propertyId===pid}).length;var nL=data.leases.filter(function(l){return l.propertyId===pid}).length;var nE=data.expenses.filter(function(e){return e.propertyId===pid}).length;var nRp=data.repairs.filter(function(r){return r.propertyId===pid}).length;var nAll=nR+nL+nE+nRp;if(nAll){if(!confirm("This property has "+nAll+" linked record(s) ("+nR+" rent, "+nL+" lease, "+nE+" expense, "+nRp+" repair). Deleting the property will also delete those records. Continue?"))return;data.rents=data.rents.filter(function(r){return r.propertyId!==pid});data.leases=data.leases.filter(function(l){return l.propertyId!==pid});data.expenses=data.expenses.filter(function(e){return e.propertyId!==pid});data.repairs=data.repairs.filter(function(r){return r.propertyId!==pid})}del(data.properties,pid,"Property")}
+  if(t.dataset.editRent){var r=data.rents.find(function(x){return x.id===t.dataset.editRent});if(r){fill("r-id",r.id);fill("r-property",r.propertyId);fill("r-tenant",r.tenant);fill("r-month",r.month);fill("r-dueday",r.dueDate);fill("r-due",r.due);fill("r-paid",r.paid);fill("r-paiddate",r.paidDate);fill("r-method",r.method);fill("r-notes",r.notes);$("form-rent-title").textContent="Edit rent record";switchScreen("rent")}}
+  if(t.dataset.delRent)del(data.rents,t.dataset.delRent,"Rent record");
+  if(t.dataset.editExpense){var e=data.expenses.find(function(x){return x.id===t.dataset.editExpense});if(e){fill("e-id",e.id);fill("e-property",e.propertyId);fill("e-date",e.date);fill("e-category",e.category);fill("e-vendor",e.vendor);fill("e-amount",e.amount);fill("e-notes",e.notes);$("form-expense-title").textContent="Edit expense";switchScreen("expenses")}}
+  if(t.dataset.delExpense)del(data.expenses,t.dataset.delExpense,"Expense");
+  if(t.dataset.editLease){var l=data.leases.find(function(x){return x.id===t.dataset.editLease});if(l){fill("l-id",l.id);fill("l-property",l.propertyId);fill("l-tenant",l.tenant);fill("l-contact",l.contact);fill("l-start",l.start);fill("l-end",l.end);fill("l-dueday",l.dueDay);fill("l-rent",l.rent);fill("l-deposit",l.deposit);fill("l-notes",l.notes);$("form-lease-title").textContent="Edit lease";switchScreen("leases")}}
+  if(t.dataset.delLease)del(data.leases,t.dataset.delLease,"Lease");
+  if(t.dataset.editRepair){var rp=data.repairs.find(function(x){return x.id===t.dataset.editRepair});if(rp){fill("rp-id",rp.id);fill("rp-property",rp.propertyId);fill("rp-date",rp.date);fill("rp-title",rp.title);fill("rp-vendor",rp.vendor);fill("rp-cost",rp.cost);fill("rp-status",rp.status);fill("rp-notes",rp.notes);$("form-repair-title").textContent="Edit repair";switchScreen("repairs")}}
+  if(t.dataset.delRepair)del(data.repairs,t.dataset.delRepair,"Repair");
+});
+
+/* ---------- filters ---------- */
+$("rent-month-filter").addEventListener("change",renderRents);
+$("expense-year").addEventListener("change",renderExpenses);
+$("expense-prop").addEventListener("change",renderExpenses);
+$("repair-filter").addEventListener("change",renderRepairs);
+
+/* ---------- toolbar ---------- */
+function csvCell(v){v=String(v==null?"":v);return /[",\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v}
+$("btn-export").addEventListener("click",function(){
+  var yr=thisYear();var lines=["Practice Foundry Rental Tracker — year-end export "+yr,"Exported,"+today(),"","RENT COLLECTED","Month,Property,Tenant,Due,Paid,Owed,Date paid,Method,Notes"];
+  data.rents.slice().sort(function(a,b){return a.month<b.month?-1:1}).forEach(function(r){if(r.month.indexOf(yr)!==0)return;lines.push([r.month,propName(r.propertyId),r.tenant,r.due,r.paid,(Number(r.due)||0)-(Number(r.paid)||0),r.paidDate||"",r.method||"",r.notes||""].map(csvCell).join(","))});
+  lines.push("","EXPENSES","Date,Property,Category,Paid to,Amount,Notes");
+  data.expenses.slice().sort(function(a,b){return a.date<b.date?-1:1}).forEach(function(e){if(e.date.indexOf(yr)!==0)return;lines.push([e.date,e.propertyId?propName(e.propertyId):"General",e.category,e.vendor||"",e.amount,e.notes||""].map(csvCell).join(","))});
+  lines.push("","REPAIRS (log only — check for duplicates before adding to expenses)","Date,Property,Repair,Vendor,Cost,Status,Notes");
+  data.repairs.slice().sort(function(a,b){return a.date<b.date?-1:1}).forEach(function(r){if(r.date.indexOf(yr)!==0)return;lines.push([r.date,propName(r.propertyId),r.title,r.vendor||"",r.cost,r.status,r.notes||""].map(csvCell).join(","))});
+  lines.push("","SUMMARY "+yr);
+  var inc=0,exp=0;data.rents.forEach(function(r){if(r.month.indexOf(yr)===0)inc+=Number(r.paid)||0});data.expenses.forEach(function(e){if(e.date.indexOf(yr)===0)exp+=Number(e.amount)||0});
+  lines.push("Rent collected,"+inc);lines.push("Expenses,"+exp);lines.push("Profit,"+(inc-exp));
+  lines.push("","General information only — not tax, legal, or financial advice.");
+  var blob=new Blob([lines.join("\n")],{type:"text/csv"});var a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="rental-tracker-"+yr+".csv";a.click();setTimeout(function(){URL.revokeObjectURL(a.href)},2000);toast("Year-end CSV downloaded.")});
+$("btn-print").addEventListener("click",function(){switchScreen("dashboard");setTimeout(function(){window.print()},60)});
+$("btn-backup").addEventListener("click",function(){var blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"});var a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="rental-tracker-backup.json";a.click();setTimeout(function(){URL.revokeObjectURL(a.href)},2000);toast("Backup downloaded.")});
+$("import-file").addEventListener("change",function(){
+  var f=this.files[0];if(!f)return;var reader=new FileReader();
+  reader.onload=function(){try{var p=JSON.parse(reader.result);if(!p||!Array.isArray(p.properties))throw new Error("bad");data=sanitize(p);save();render();toast("Backup restored.")}catch(e){toast("That file is not a Rental Tracker backup.")}};
+  reader.readAsText(f);this.value=""});
+$("btn-sample").addEventListener("click",function(){if((data.properties.length||data.rents.length||data.expenses.length||data.leases.length||data.repairs.length)&&!confirm("Replace ALL your current data (properties, rent, expenses, leases, and repairs) with sample data?"))return;data=sample();save();render();toast("Sample data loaded — try every screen, then Clear all data.")});
+$("btn-clear").addEventListener("click",function(){if(!confirm("Clear ALL Rental Tracker data in this browser? Download a backup first if you need it."))return;data=blank();save();render();toast("All data cleared.")});
+
+/* ---------- init ---------- */
+(function init(){
+  var yrs={};data.expenses.forEach(function(e){if(e.date)yrs[e.date.slice(0,4)]=1});yrs[thisYear()]=1;
+  $("expense-year").innerHTML=Object.keys(yrs).sort().reverse().map(function(y){return '<option value="'+y+'"'+(y===thisYear()?" selected":"")+">"+y+"</option>"}).join("");
+  $("e-date").value=today();$("rp-date").value=today();$("r-month").value=thisMonth();
+  if(!localStorage.getItem(KEY)){data=sample();save()}
+  render();
+})();
+})();
+</script>
+</body>
+</html>
