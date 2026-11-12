@@ -6,6 +6,7 @@
 <link rel="icon" type="image/png" href="practice-foundry-mark.png">
 <title>Practice Foundry</title>
 <meta name="description" content="Practice Foundry offers practical solutions for building and running medical practices and professional businesses, plus ready-to-use spreadsheets and templates on Etsy.">
+<script>document.documentElement.classList.add('js-anim');</script>
 <style>
   :root{
     --navy:#002050;
@@ -60,10 +61,22 @@
 
   /* Hero */
   .hero{
-    background:var(--navy);
+    background-color:var(--navy);
+    background-image:
+      linear-gradient(rgba(255,255,255,.035) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,.035) 1px, transparent 1px);
+    background-size:44px 44px;
     color:#fff;
     padding:72px 0 64px;
+    position:relative;
+    overflow:hidden;
   }
+  #embers{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;opacity:.6}
+  .hero .wrap{position:relative;z-index:1}
+  .hero-logo{animation:pf-mark-in .9s ease-out both}
+  @keyframes pf-mark-in{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+  .accent-line{display:block;width:72px;height:4px;background:var(--copper);border-radius:2px;margin-top:18px;transform-origin:left;animation:pf-line-in .8s .35s ease-out both}
+  @keyframes pf-line-in{from{transform:scaleX(0)}to{transform:scaleX(1)}}
   .hero-grid{
     display:grid;grid-template-columns:1.35fr .85fr;gap:48px;align-items:end;
   }
@@ -165,6 +178,52 @@
   .text-link{color:#9a4e18;font-weight:700;text-decoration:underline;text-underline-offset:3px}
   .text-link:hover{color:var(--navy)}
 
+  /* Scroll reveal (selective, disabled without JS or with reduced motion) */
+  .js-anim .reveal{opacity:0;transform:translateY(14px);transition:opacity .55s ease,transform .55s ease}
+  .js-anim .reveal.in{opacity:1;transform:none}
+
+  /* Icons */
+  .icon{width:26px;height:26px;flex:none;color:var(--copper);vertical-align:-6px;margin-right:10px}
+  .icon use{stroke:currentColor}
+
+  /* Form-Build-Launch progress */
+  .steps-progress{height:3px;background:var(--line);border-radius:2px;margin:4px 0 26px;overflow:hidden}
+  .steps-progress i{display:block;height:100%;background:var(--copper);transform:scaleX(0);transform-origin:left}
+
+  /* Before / after */
+  .ba{display:grid;grid-template-columns:1fr auto 1fr;gap:16px;align-items:stretch;margin:30px 0 6px}
+  .ba-panel{border:1px solid var(--line);border-radius:8px;padding:18px 20px;background:#fff}
+  .ba-panel h3{font-size:15px;color:var(--navy);margin-bottom:10px}
+  .ba-panel ul{list-style:none;font-size:14.5px;color:#3d4c5e}
+  .ba-panel li{padding:5px 0;border-bottom:1px dashed var(--line)}
+  .ba-panel li:last-child{border-bottom:none}
+  .ba-panel.sorted li{border-bottom:none;padding:4px 0}
+  .ba-arrow{align-self:center;font-size:22px;color:var(--copper);font-weight:700}
+  @media(max-width:760px){.ba{grid-template-columns:1fr}.ba-arrow{transform:rotate(90deg);justify-self:center}}
+
+  /* Product visuals */
+  .visual{margin-top:22px;max-width:560px}
+  .frame{border:1px solid #c9c0b2;border-radius:10px;background:#fff;box-shadow:0 10px 28px rgba(0,32,80,.10);overflow:hidden;transition:box-shadow .2s ease}
+  .frame:hover{box-shadow:0 14px 34px rgba(0,32,80,.16)}
+  .frame-bar{display:flex;gap:6px;align-items:center;background:var(--navy);padding:9px 12px}
+  .frame-bar i{width:9px;height:9px;border-radius:50%;background:rgba(255,255,255,.35);display:block}
+  .frame-bar b{color:#fff;font-size:12px;font-weight:600;margin-left:8px;letter-spacing:.02em}
+  .sheet{padding:14px 16px 16px}
+  .sheet table{width:100%;border-collapse:collapse;font-size:13px;color:#3d4c5e}
+  .sheet th{ text-align:left;color:var(--navy);border-bottom:2px solid var(--copper-soft);padding:5px 6px;font-size:12px}
+  .sheet td{border-bottom:1px solid #eee5d8;padding:5px 6px}
+  .sheet .num-cell{text-align:right;font-variant-numeric:tabular-nums}
+  .pill{display:inline-block;font-size:11px;font-weight:700;padding:2px 8px;border-radius:999px;background:var(--copper-soft);color:#9a4e18}
+  .pill.ok{background:#e3efe2;color:#2f5d2a}
+  .bars{display:grid;gap:8px;margin-top:6px}
+  .bars div{display:grid;grid-template-columns:92px 1fr 44px;gap:10px;align-items:center;font-size:12.5px;color:#3d4c5e}
+  .bars i{height:8px;background:#eee5d8;border-radius:4px;display:block;overflow:hidden}
+  .bars i b{display:block;height:100%;background:var(--copper)}
+  .visual-cap{font-size:12.5px;color:var(--muted);margin-top:8px}
+  .stat-strip{display:flex;gap:28px;flex-wrap:wrap;margin-top:22px}
+  .stat-strip div b{display:block;font-family:Georgia,serif;font-size:30px;color:var(--navy)}
+  .stat-strip div > span{font-size:13px;color:var(--muted)}
+
   /* Contact band */
   .contact-band{
     margin:56px 0 64px;background:var(--navy);color:#fff;border-radius:8px;
@@ -203,11 +262,25 @@
   }
   @media (prefers-reduced-motion: reduce){
     html{scroll-behavior:auto}
-    *{transition:none !important}
+    *{transition:none !important;animation:none !important}
+    .js-anim .reveal{opacity:1;transform:none}
+    #embers{display:none}
   }
 </style>
 </head>
 <body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="i-calc" viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M8 7h8M8 12h.01M12 12h.01M16 12h.01M8 16h.01M12 16h.01M16 16h.01"/></symbol>
+    <symbol id="i-clip" viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round"><rect x="6" y="4" width="12" height="17" rx="2"/><path d="M9 4a3 3 0 0 1 6 0M9 12l2 2 4-4"/></symbol>
+    <symbol id="i-bell" viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 10h16M8 3v4M16 3v4M15 16l1.5 1.5L20 14"/></symbol>
+    <symbol id="i-key" viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round"><path d="M4 20v-5L14.5 4.5a4.24 4.24 0 0 1 6 6L18 13l-3-3-2.5 2.5V15H10v2.5H7V20H4z"/></symbol>
+    <symbol id="i-msg" viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round"><path d="M4 5h16v11H9l-5 4V5z"/><path d="M8 9h8M8 12h5"/></symbol>
+    <symbol id="i-chart" viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round"><path d="M4 4v16h16"/><path d="M8 16v-5M12 16V8M16 16v-8"/></symbol>
+    <symbol id="i-plan" viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="12" r="8"/><path d="M12 8v4l3 2"/></symbol>
+  </defs>
+</svg>
 
 <header>
   <div class="wrap header-inner">
@@ -217,10 +290,11 @@
 </header>
 
 <section class="hero">
+  <canvas id="embers" aria-hidden="true"></canvas>
   <div class="wrap hero-grid">
     <div>
       <p class="kicker">Practice Foundry</p>
-      <h1>Practical solutions for building and running your own practice.</h1>
+      <h1>Practical solutions for building and running your own practice.<span class="accent-line" aria-hidden="true"></span></h1>
       <p class="hero-intro">Practice Foundry helps physicians build and run medical practices, and helps other professionals do the same with their businesses. Pricing, paperwork, everyday admin, and simple systems you can actually keep up with. AI is one of the tools we use — practical help is the product.</p>
       <p class="founder-note">Created by a physician.</p>
       <div class="hero-actions">
@@ -245,26 +319,38 @@
 </section>
 
 <main class="wrap">
-  <section class="start" id="start" aria-label="Start your own practice">
+  <section class="start reveal" id="start" aria-label="Start your own practice">
     <div class="offer-head">
       <h2>Start your own practice</h2>
       <p>Thinking about opening your own practice? Start with a list, then work it in order. Three stages, no giant leap.</p>
     </div>
-    <div class="start-steps">
+    <div class="steps-progress" aria-hidden="true"><i id="stepsFill"></i></div>
+    <div class="start-steps" id="startSteps">
       <div class="start-step">
         <p class="num">01 — Form</p>
-        <h3>Get the shape right</h3>
+        <h3><svg class="icon" aria-hidden="true"><use href="#i-calc"/></svg>Get the shape right</h3>
         <p>Decide what you will offer, what you will charge, and what the first months need to cover. A simple pricing plan and a monthly money picture come before almost everything else.</p>
       </div>
       <div class="start-step">
         <p class="num">02 — Build</p>
-        <h3>Set up the back office</h3>
+        <h3><svg class="icon" aria-hidden="true"><use href="#i-clip"/></svg>Set up the back office</h3>
         <p>Everyday admin, written down once: office procedures, patient messages, schedules, and a finance tracker. This is the pile nobody warns you about, sorted before opening day.</p>
       </div>
       <div class="start-step">
         <p class="num">03 — Launch</p>
-        <h3>Open with a checklist</h3>
+        <h3><svg class="icon" aria-hidden="true"><use href="#i-bell"/></svg>Open with a checklist</h3>
         <p>An opening-week checklist, a simple website, and a workflow for week one, so opening day is a list you follow instead of a scramble you survive.</p>
+      </div>
+    </div>
+    <div class="ba" aria-label="From scattered paperwork to a sorted checklist">
+      <div class="ba-panel">
+        <h3>Before — scattered</h3>
+        <ul><li>Pricing in your head</li><li>Forms in three folders</li><li>Bills in a drawer</li><li>Opening day in a panic</li></ul>
+      </div>
+      <div class="ba-arrow" aria-hidden="true">&rarr;</div>
+      <div class="ba-panel sorted">
+        <h3>After — sorted</h3>
+        <ul><li>&#10003; A price you can defend</li><li>&#10003; Procedures written once</li><li>&#10003; Money tracked monthly</li><li>&#10003; A checklist for week one</li></ul>
       </div>
     </div>
     <div class="start-actions">
@@ -274,9 +360,9 @@
     <p class="start-note">What Practice Foundry does not do: credentialing, payer enrollment, EHR setup, or legal and regulatory filings. Those stay with you and your licensed professionals. Practice Foundry covers the planning, pricing, paperwork, and everyday systems around them.</p>
   </section>
 
-  <section class="offer" aria-label="Practical AI help">
+  <section class="offer reveal" aria-label="Practical AI help">
     <div class="offer-head">
-      <h2>Practical help, without the hype</h2>
+      <h2><svg class="icon" aria-hidden="true"><use href="#i-msg"/></svg>Practical help, without the hype</h2>
       <p>For people starting a practice or professional business, and for owners who are already up and running.</p>
     </div>
     <div class="offer-body">
@@ -291,41 +377,79 @@
     </div>
   </section>
 
-  <section class="offer" aria-label="Practice Foundry Rental Tracker">
+  <section class="offer reveal" aria-label="Practice Foundry Rental Tracker">
     <div class="offer-head">
-      <span class="status">Coming soon — not available yet</span>
-      <h2>Practice Foundry Rental Tracker</h2>
+      <span class="status">Free — no account, no signup</span>
+      <h2><svg class="icon" aria-hidden="true"><use href="#i-key"/></svg>Practice Foundry Rental Tracker</h2>
       <p>A simple web app for landlords with 1–10 units.</p>
     </div>
     <div class="offer-body">
-      <p>The Rental Tracker is being built as an easier way to keep track of rent and rental basics online. It will be one flat price: $9/month, no tiers.</p>
-      <p>It is not available yet, and there is no signup or payment form for it. If you need something today, the one-time spreadsheet version is available now.</p>
-      <p><a class="text-link" href="https://practicefoundry.etsy.com/listing/4606043544/rental-property-tracker-spreadsheet-rent">Get the $19 Rental Property Tracker spreadsheet on Etsy</a></p>
+      <p>Rent in, expenses out, lease dates and repairs — in six screens that run right in your browser. Free to use, with no account and no payment. Your data stays on your device.</p>
+      <div class="visual">
+        <div class="frame">
+          <div class="frame-bar"><i></i><i></i><i></i><b>Rental Tracker — Dashboard (sample)</b></div>
+          <div class="sheet">
+            <table>
+              <tr><th>Unit</th><th>Rent</th><th>Status</th><th class="num-cell">This month</th></tr>
+              <tr><td>Unit A</td><td>Monthly</td><td><span class="pill ok">Paid</span></td><td class="num-cell">$1,250</td></tr>
+              <tr><td>Unit B</td><td>Monthly</td><td><span class="pill">Due soon</span></td><td class="num-cell">$975</td></tr>
+              <tr><td>Unit C</td><td>Monthly</td><td><span class="pill ok">Paid</span></td><td class="num-cell">$1,100</td></tr>
+            </table>
+            <div class="bars">
+              <div><span>Rent in</span><i><b style="width:82%"></b></i><span>82%</span></div>
+              <div><span>Expenses</span><i><b style="width:34%"></b></i><span>34%</span></div>
+            </div>
+          </div>
+        </div>
+        <p class="visual-cap">Illustrative sample view. Your tracker opens with sample data you can clear.</p>
+      </div>
+      <p><a class="text-link" href="rental-tracker.html">Open the free Rental Tracker &rarr;</a></p>
+      <p><a class="text-link" href="https://practicefoundry.etsy.com/listing/4606043544/rental-property-tracker-spreadsheet-rent">Prefer a spreadsheet? Get the $19 Rental Property Tracker on Etsy</a></p>
     </div>
   </section>
 
-  <section class="offer" aria-label="CredentialWatch by Practice Foundry">
+  <section class="offer reveal" aria-label="CredentialWatch by Practice Foundry">
     <div class="offer-head">
       <span class="status">Coming soon — waitlist open</span>
-      <h2>CredentialWatch</h2>
+      <h2><svg class="icon" aria-hidden="true"><use href="#i-bell"/></svg>CredentialWatch</h2>
       <p>License and credential expiry tracking for small practices, by Practice Foundry.</p>
     </div>
     <div class="offer-body">
       <p>CredentialWatch watches expiry dates for licenses, DEA registrations, certifications, and more, then reminds the staff member and the manager before anything lapses. No patient data, and no credentialing paperwork filed for you — just a watch that does not forget.</p>
+      <div class="visual">
+        <div class="frame">
+          <div class="frame-bar"><i></i><i></i><i></i><b>CredentialWatch — Expiry watch (sample)</b></div>
+          <div class="sheet">
+            <table>
+              <tr><th>Credential</th><th>Expires</th><th>Status</th></tr>
+              <tr><td>State license</td><td>In 42 days</td><td><span class="pill">Remind</span></td></tr>
+              <tr><td>DEA registration</td><td>In 90 days</td><td><span class="pill ok">On track</span></td></tr>
+              <tr><td>Malpractice certificate</td><td>In 12 days</td><td><span class="pill">Due soon</span></td></tr>
+              <tr><td>BLS / ACLS</td><td>In 60 days</td><td><span class="pill ok">On track</span></td></tr>
+            </table>
+          </div>
+        </div>
+        <p class="visual-cap">Illustrative sample view of the planned tracker. Reminders at 90, 60, 30, and 7 days.</p>
+      </div>
       <p><a class="text-link" href="credential-watch.html">See how CredentialWatch works &rarr;</a></p>
     </div>
   </section>
 
-  <div class="section-head">
-    <h2>Templates, made for the way you work</h2>
+  <div class="section-head reveal">
+    <h2><svg class="icon" aria-hidden="true"><use href="#i-chart"/></svg>Templates, made for the way you work</h2>
     <p>Prefer to do it yourself? Choose the section that sounds most like you, then browse the matching templates in the shop.</p>
+    <div class="stat-strip">
+      <div><b><span data-count="21">21</span></b><span>templates in the shop</span></div>
+      <div><b><span data-count="3">3</span></b><span>collections: practice, business, planning</span></div>
+      <div><b>$9&ndash;$79</b><span>one-time, yours to keep</span></div>
+    </div>
   </div>
 
   <div class="audience">
     <article class="audience-row">
       <div class="num">01</div>
       <div>
-        <h3>For physicians</h3>
+        <h3><svg class="icon" aria-hidden="true"><use href="#i-clip"/></svg>For physicians</h3>
         <p>For physicians running their own practice who need straightforward tools for the business side of care, without extra complexity.</p>
         <p style="margin-top:8px"><a class="text-link" href="physicians.html">View physician templates &rarr;</a></p>
       </div>
@@ -334,7 +458,7 @@
     <article class="audience-row">
       <div class="num">02</div>
       <div>
-        <h3>For freelancers &amp; small business</h3>
+        <h3><svg class="icon" aria-hidden="true"><use href="#i-calc"/></svg>For freelancers &amp; small business</h3>
         <p>For freelancers and small business owners who want simple, ready-to-use systems for pricing, invoicing, and bookkeeping.</p>
         <p style="margin-top:8px"><a class="text-link" href="freelancers-small-business.html">View freelancer &amp; small business templates &rarr;</a></p>
       </div>
@@ -343,7 +467,7 @@
     <article class="audience-row">
       <div class="num">03</div>
       <div>
-        <h3>For everyday planning</h3>
+        <h3><svg class="icon" aria-hidden="true"><use href="#i-plan"/></svg>For everyday planning</h3>
         <p>For anyone who wants practical planners and trackers to stay organized with trips, rentals, and everyday life.</p>
         <p style="margin-top:8px"><a class="text-link" href="everyday-planning.html">View everyday planning templates &rarr;</a></p>
       </div>
@@ -367,6 +491,98 @@
     <p class="copyright">&copy; 2026 Practice Foundry. All rights reserved.</p>
   </div>
 </footer>
+
+<script>
+(function(){
+  var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* Scroll reveal — selective sections only */
+  var revealEls = document.querySelectorAll('.reveal');
+  if (reduced || !('IntersectionObserver' in window)) {
+    revealEls.forEach(function(el){ el.classList.add('in'); });
+  } else {
+    var ro = new IntersectionObserver(function(entries){
+      entries.forEach(function(e){ if (e.isIntersecting) { e.target.classList.add('in'); ro.unobserve(e.target); } });
+    }, {threshold: 0.12});
+    revealEls.forEach(function(el){ ro.observe(el); });
+    /* Fail-safe: content must never stay hidden if the observer is missed */
+    setTimeout(function(){ revealEls.forEach(function(el){ el.classList.add('in'); }); }, 1600);
+  }
+
+  /* Count-up for template stats */
+  var counters = document.querySelectorAll('[data-count]');
+  function runCount(el){
+    var target = parseInt(el.getAttribute('data-count'), 10) || 0;
+    if (reduced) { el.textContent = target; return; }
+    var start = null;
+    function tick(ts){
+      if (!start) start = ts;
+      var p = Math.min((ts - start) / 700, 1);
+      el.textContent = Math.round(target * p);
+      if (p < 1) requestAnimationFrame(tick);
+    }
+    requestAnimationFrame(tick);
+  }
+  if ('IntersectionObserver' in window && !reduced) {
+    var co = new IntersectionObserver(function(entries){
+      entries.forEach(function(e){ if (e.isIntersecting) { runCount(e.target); co.unobserve(e.target); } });
+    }, {threshold: 0.4});
+    counters.forEach(function(el){ co.observe(el); });
+  }
+
+  /* Form-Build-Launch progress line */
+  var steps = document.getElementById('startSteps');
+  var fill = document.getElementById('stepsFill');
+  if (steps && fill) {
+    if (reduced) { fill.style.transform = 'scaleX(1)'; }
+    else {
+      var ticking = false;
+      function update(){
+        ticking = false;
+        var r = steps.getBoundingClientRect();
+        var vh = window.innerHeight || 800;
+        var p = (vh * 0.85 - r.top) / Math.max(r.height, 1);
+        p = Math.max(0, Math.min(1, p));
+        fill.style.transform = 'scaleX(' + p.toFixed(3) + ')';
+      }
+      window.addEventListener('scroll', function(){ if (!ticking) { ticking = true; requestAnimationFrame(update); } }, {passive: true});
+      window.addEventListener('resize', update);
+      update();
+    }
+  }
+
+  /* Hero embers — a few copper sparks rising, forge-style */
+  var canvas = document.getElementById('embers');
+  if (canvas && !reduced) {
+    var ctx = canvas.getContext('2d');
+    var hero = canvas.parentElement;
+    var W, H, parts = [], raf = null;
+    function size(){
+      W = canvas.width = hero.offsetWidth;
+      H = canvas.height = hero.offsetHeight;
+    }
+    function make(seed){
+      return { x: Math.random()*W, y: seed ? Math.random()*H : H + 6, r: 1 + Math.random()*1.8,
+        s: 0.25 + Math.random()*0.55, drift: (Math.random()-0.5)*0.3, a: 0.25 + Math.random()*0.5 };
+    }
+    function frame(){
+      ctx.clearRect(0, 0, W, H);
+      parts.forEach(function(p, i){
+        p.y -= p.s; p.x += p.drift;
+        if (p.y < -8) parts[i] = make(false);
+        ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI*2);
+        ctx.fillStyle = 'rgba(224,122,48,' + p.a.toFixed(2) + ')'; ctx.fill();
+      });
+      raf = requestAnimationFrame(frame);
+    }
+    function start(){ if (!raf) { size(); if (!parts.length) for (var i=0;i<16;i++) parts.push(make(true)); frame(); } }
+    function stop(){ if (raf) cancelAnimationFrame(raf); raf = null; }
+    document.addEventListener('visibilitychange', function(){ document.hidden ? stop() : start(); });
+    window.addEventListener('resize', size);
+    start();
+  }
+})();
+</script>
 
 </body>
 </html>
